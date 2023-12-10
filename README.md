@@ -6,6 +6,7 @@ The uGMRT_band4_polarization_pipeline.py is the pipeline used to image polarized
 
 
 Pipeline originally developed by Russ Taylor in 2011
+
 Modified by Ishwara Chandra in 2018 
 Improved version of the polarization pipeline by Silpa Sasikumar
 Major improvements in flagging and self-calibration 
