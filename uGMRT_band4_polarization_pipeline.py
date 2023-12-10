@@ -234,7 +234,7 @@ def PA(f,a,b):
 
 print("At frequency (in GHz)=",f0)
 
-data = np.loadtxt('/data/kharb/salmoli/Calibrator_data/'+fieldnames[int(polcalib)]+'_2019.txt')
+data = np.loadtxt('Calibrator_data/'+fieldnames[int(polcalib)]+'_2019.txt')
 data_index_range=np.where(data[:,0]<3.0)    #change if reffreq lies in different frequency range
 data_to_use=data[data_index_range]
 popt, pcov = curve_fit(S, data_to_use[:,0], data_to_use[:,1])
