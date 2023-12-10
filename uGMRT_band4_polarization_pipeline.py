@@ -62,7 +62,7 @@ listobs(vis=ms)
 
 #plot (rr,ll correlations only) amp vs time (without averaging over channels, if reqd. plot for a single channel), amp vs channel for each field iterating over each antenna. Also check the phase vs time/channel for the flux calibrators.
 
-#you can decide the clipping fluxes on the basis of the amplitudes for each field
+#you can decide the clipping fluxes based on the amplitudes for each field
  
 
 ######################################################################################################################################################################################################
