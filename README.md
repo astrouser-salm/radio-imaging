@@ -2,8 +2,11 @@
 Queries: salmoli.ghosh@gmail.com
 Author: Salmoli Ghosh
 
-The uGMRT_band4_polarization_pipeline.py is the pipeline used to image polarized emission from astronomical sources like active galaxies, etc. using uGMRT band 4 (550 - 900 MHz) data.
+The uGMRT_band4_polarization_pipeline.py is the pipeline used to image polarized emission from astronomical sources like active galaxies, etc. using uGMRT band 4 (550 - 900 MHz) data. 
 
+This version of the pipeline is tested for CASA 6.2, and can be used safely for versions above CASA 6.
+
+The files gvfits and listscan should be made executable before running them as commands. ($chmod +x listscan, $chmod +x gvfits)
 
 Pipeline originally developed by Russ Taylor in 2011
 
