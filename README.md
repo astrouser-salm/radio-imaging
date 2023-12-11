@@ -2,7 +2,8 @@
 Queries: salmoli.ghosh@gmail.com
 Author: Salmoli Ghosh
 
-The uGMRT_band4_polarization_pipeline.py is the pipeline used to image polarized emission from astronomical sources like active galaxies, etc. using uGMRT band 4 (550 - 900 MHz) data. 
+The uGMRT_band4_polarization_pipeline.py is the pipeline used to image polarized emission from astronomical sources like active galaxies, etc. using uGMRT band 4 (550 - 900 MHz) data.
+The VLA_polarization_pipeline is the modified version of the EVLA polarization pipeline by Alice Pasetto.
 
 This version of the pipeline is tested for CASA 6.2, and can be used safely for versions above CASA 6.
 
