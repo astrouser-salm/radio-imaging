@@ -399,7 +399,7 @@ count=1
 scmode='p'
 
 
-print ("Prepaing dirty image")
+print ("Preparing dirty image")
 
 tclean(vis=ms,
        datacolumn='data',
