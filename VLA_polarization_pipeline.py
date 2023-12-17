@@ -141,7 +141,7 @@ print (" starting Polarization calibration -> ")
 print (" setting the polarization calibrator models for polarized calibrator-> %s" % polcalib)
  
 setjy(vis=ms,field=fluxfield,spw='',selectdata=False,timerange='',scan='',intent='', 
-observation='',scalebychan=True,standard='manual',model='',modimage='',listmodels=False, 
+observation='',scalebychan=True,standard='manual',model='',listmodels=False, 
 fluxdensity=[I,0,0,0],spix=alpha,reffreq=rfreq,polindex=polfrac,polangle=polangle,
 rotmeas=0,fluxdict={},useephemdir=False,interpolation='nearest',usescratch=True,ismms=False)
     
@@ -154,7 +154,7 @@ rotmeas=0,fluxdict={},useephemdir=False,interpolation='nearest',usescratch=True,
 print (" setting the polarization calibrator models for unpolarized calibrator-> %s" % unpolcal) 
    
 setjy(vis=ms,field=unpolfield,spw='',selectdata=False,timerange="",scan="",intent="",
-observation="",scalebychan=True,standard="manual",model="",modimage="",listmodels=False,
+observation="",scalebychan=True,standard="manual",model="",listmodels=False,
 fluxdensity=[fluxdensity_UNPOL , 0, 0, 0],spix=spix_UNPOL,reffreq=rfreq,polindex=[],polangle=[],
 rotmeas=0,fluxdict={},useephemdir=False,interpolation="nearest",usescratch=True,ismms=False)
 
