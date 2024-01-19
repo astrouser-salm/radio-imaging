@@ -1,7 +1,7 @@
 '''
 # Pipeline originally developed by Russ Taylor in 2011
 # Modified by Ishwara Chandra in 2018 
-# Improved version of the polarization pipeline by Silpa Sasikumar
+# Improved version of the polarization pipeline by Silpa Sasikumar, Janhavi Baghel, and Salmoli Ghosh
 # Major improvements in flagging and self-calibration 
 # Kindly refer to the paper: Ishwara-Chandra et al 2020  
 #
