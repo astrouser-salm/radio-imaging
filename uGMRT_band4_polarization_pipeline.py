@@ -115,15 +115,15 @@ uvrascal='>0.75klambda'           # uvrange for gain calibration in self calibra
 # Filenames for initial round of calibration
 kcorrfile0 = ms+'.kcal0'
 bpassfile0 = ms+'.bcal0'
-gainfilep0 =  ms+'.gcalp0'
-gainfile0 =  ms+'.gcal0'
+p0 =  ms+'.gcalp0'
+0 =  ms+'.gcal0'
 fluxfile0 =  ms+'.fluxscale0'
 #
 # Filenames for final round of calibration
 kcorrfile= ms+'.kcal'
 bpassfile= ms+'.bcal'
-gainfilep =  ms+'.gcalp'
-gainfile=  ms+'.gcal'
+p =  ms+'.gcalp'
+=  ms+'.gcal'
 fluxfile=  ms+'.fluxscale'
 #
 #Filenames for polarization calibration
@@ -391,8 +391,8 @@ print('setjy output',set1)
 # Phase only calibration added - suggested and tested by Silpa Sasikumar
 #
 default(gaincal)
-print (" starting initial phase only gaincal -> %s" % gainfilep0)
-gaincal(vis=ms,caltable=gainfilep0,field=gaincals, spw=gainspw,
+print (" starting initial phase only gaincal -> %s" % p0)
+gaincal(vis=ms,caltable=p0,field=gaincals, spw=gainspw,
          solint="30s",combine="", minsnr=3.0, refant=ref_ant, solnorm=False,
          gaintype="G",calmode="p",append=False, parang=True)
 
@@ -400,19 +400,19 @@ default(gaincal)
 print (" starting delay calibration -> %s" % kcorrfile0)
 gaincal(vis=ms, caltable = kcorrfile0, field = kcorrfield, spw = '', 
         refant = ref_ant, solnorm = True,  gaintype = 'K', 
-        gaintable =[gainfilep0], gainfield=gaincals, solint = '1.0min', combine = 'scan', minsnr=3.0,
+        gaintable =[p0], gainfield=gaincals, solint = '1.0min', combine = 'scan', minsnr=3.0,
         parang = True, append = False)
 
 default(bandpass)  
 print (" starting bandpass -> %s" % bpassfile0)
 bandpass(vis=ms, caltable = bpassfile0, field = bpassfield, spw = '', minsnr=3.0,
          refant = ref_ant, solnorm = True,  solint = 'inf', 
-         bandtype = 'B', fillgaps = 0, gaintable = [gainfilep0, kcorrfile0], gainfield=[gaincals,kcorrfield], 
+         bandtype = 'B', fillgaps = 0, gaintable = [p0, kcorrfile0], gainfield=[gaincals,kcorrfield], 
          parang = True, append = False)
          
 default(gaincal)         
-print (" starting gaincal -> %s" % gainfile0)
-gaincal(vis=ms, caltable = gainfile0, field = gaincals, spw = gainspw, 
+print (" starting gaincal -> %s" % 0)
+gaincal(vis=ms, caltable = 0, field = gaincals, spw = gainspw, 
         refant = ref_ant, solint = '1.0min', solnorm = False,  
         gaintype = 'G', combine = '', calmode = 'ap', minsnr=3.0, uvrange=uvracal,
         gaintable = [kcorrfile0,bpassfile0], gainfield = [kcorrfield,bpassfield],
@@ -421,7 +421,7 @@ gaincal(vis=ms, caltable = gainfile0, field = gaincals, spw = gainspw,
         
 default(fluxscale)
 print (" starting fluxscale -> %s" % fluxfile0) 
-fluxsc=fluxscale(vis=ms, caltable = gainfile0, reference = [fluxfield], 
+fluxsc=fluxscale(vis=ms, caltable = 0, reference = [fluxfield], 
           transfer = [transferfield], fluxtable = fluxfile0, 
           listfile = ms+'.fluxscale.txt0',
           append = False)               
@@ -441,7 +441,7 @@ for i in range(0,len(fluxfieldind)):
 	print (" applying calibrations: primary calibrator",fieldnames[int(fluxfieldind[i])])
 	default(applycal)
 	applycal(vis=ms, field = fluxfieldind[i], spw = '', selectdata=False, calwt = False,
-    	gaintable = [kcorrfile0,bpassfile0, gainfile0], interp=['','nearest','linear'],
+    	gaintable = [kcorrfile0,bpassfile0, fluxfile0], interp=['','nearest','linear'],
    	gainfield = [kcorrfield,bpassfield,fluxfieldind[i]], 
     	parang = True)
 
@@ -769,7 +769,7 @@ print  (" Applying Calibrations:" )
 for i in range(0,len(fluxfieldind)):
 	print (" applying calibrations: primary calibrator",fieldnames[int(fluxfieldind[i])])
 	applycal(vis=ms, field = fluxfieldind[i], spw = '', selectdata=False, calwt = False,
-    	gaintable = [kcorrfile,bpassfile, gainfile, kcross, leakage, polang], interp=['','nearest','nearest','','',''],
+    	gaintable = [kcorrfile,bpassfile, fluxfile, kcross, leakage, polang], interp=['','nearest','nearest','','',''],
     	gainfield = [kcorrfield,bpassfield,fluxfieldind[i], kcrosscalib, leakagecalib, polangcalib],
     	parang = True)
 
