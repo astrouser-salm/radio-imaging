@@ -115,15 +115,15 @@ uvrascal='>0.75klambda'           # uvrange for gain calibration in self calibra
 # Filenames for initial round of calibration
 kcorrfile0 = ms+'.kcal0'
 bpassfile0 = ms+'.bcal0'
-p0 =  ms+'.gcalp0'
-0 =  ms+'.gcal0'
+gainfilep0 =  ms+'.gcalp0'
+gainfile0 =  ms+'.gcal0'
 fluxfile0 =  ms+'.fluxscale0'
 #
 # Filenames for final round of calibration
 kcorrfile= ms+'.kcal'
 bpassfile= ms+'.bcal'
-p =  ms+'.gcalp'
-=  ms+'.gcal'
+gainfilep =  ms+'.gcalp'
+gainfile=  ms+'.gcal'
 fluxfile=  ms+'.fluxscale'
 #
 #Filenames for polarization calibration
