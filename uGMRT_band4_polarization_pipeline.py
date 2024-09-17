@@ -115,7 +115,7 @@ uvrascal='>0.75klambda'           # uvrange for gain calibration in self calibra
 # Filenames for initial round of calibration
 kcorrfile0 = ms+'.kcal0'
 bpassfile0 = ms+'.bcal0'
-gainfilep0 =  ms+'.gcalp0'
+gainfile =  ms+'.gcalp0'
 gainfile0 =  ms+'.gcal0'
 fluxfile0 =  ms+'.fluxscale0'
 #
@@ -391,8 +391,8 @@ print('setjy output',set1)
 # Phase only calibration added - suggested and tested by Silpa Sasikumar
 #
 default(gaincal)
-print (" starting initial phase only gaincal -> %s" % p0)
-gaincal(vis=ms,caltable=p0,field=gaincals, spw=gainspw,
+print (" starting initial phase only gaincal -> %s" % gainfilep0)
+gaincal(vis=ms,caltable=gainfilep0,field=gaincals, spw=gainspw,
          solint="30s",combine="", minsnr=3.0, refant=ref_ant, solnorm=False,
          gaintype="G",calmode="p",append=False, parang=True)
 
@@ -400,14 +400,14 @@ default(gaincal)
 print (" starting delay calibration -> %s" % kcorrfile0)
 gaincal(vis=ms, caltable = kcorrfile0, field = kcorrfield, spw = '', 
         refant = ref_ant, solnorm = True,  gaintype = 'K', 
-        gaintable =[p0], gainfield=gaincals, solint = '1.0min', combine = 'scan', minsnr=3.0,
+        gaintable =[gainfilep0], gainfield=gaincals, solint = '1.0min', combine = 'scan', minsnr=3.0,
         parang = True, append = False)
 
 default(bandpass)  
 print (" starting bandpass -> %s" % bpassfile0)
 bandpass(vis=ms, caltable = bpassfile0, field = bpassfield, spw = '', minsnr=3.0,
          refant = ref_ant, solnorm = True,  solint = 'inf', 
-         bandtype = 'B', fillgaps = 0, gaintable = [p0, kcorrfile0], gainfield=[gaincals,kcorrfield], 
+         bandtype = 'B', fillgaps = 0, gaintable = [gainfilep0, kcorrfile0], gainfield=[gaincals,kcorrfield], 
          parang = True, append = False)
          
 default(gaincal)         
