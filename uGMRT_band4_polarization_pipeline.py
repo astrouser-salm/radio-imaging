@@ -115,7 +115,7 @@ uvrascal='>0.75klambda'           # uvrange for gain calibration in self calibra
 # Filenames for initial round of calibration
 kcorrfile0 = ms+'.kcal0'
 bpassfile0 = ms+'.bcal0'
-gainfile =  ms+'.gcalp0'
+gainfilep0 =  ms+'.gcalp0'
 gainfile0 =  ms+'.gcal0'
 fluxfile0 =  ms+'.fluxscale0'
 #
@@ -411,8 +411,8 @@ bandpass(vis=ms, caltable = bpassfile0, field = bpassfield, spw = '', minsnr=3.0
          parang = True, append = False)
          
 default(gaincal)         
-print (" starting gaincal -> %s" % 0)
-gaincal(vis=ms, caltable = 0, field = gaincals, spw = gainspw, 
+print (" starting gaincal -> %s" % gainfile0)
+gaincal(vis=ms, caltable = gainfile0, field = gaincals, spw = gainspw, 
         refant = ref_ant, solint = '1.0min', solnorm = False,  
         gaintype = 'G', combine = '', calmode = 'ap', minsnr=3.0, uvrange=uvracal,
         gaintable = [kcorrfile0,bpassfile0], gainfield = [kcorrfield,bpassfield],
@@ -421,7 +421,7 @@ gaincal(vis=ms, caltable = 0, field = gaincals, spw = gainspw,
         
 default(fluxscale)
 print (" starting fluxscale -> %s" % fluxfile0) 
-fluxsc=fluxscale(vis=ms, caltable = 0, reference = [fluxfield], 
+fluxsc=fluxscale(vis=ms, caltable = gainfile0, reference = [fluxfield], 
           transfer = [transferfield], fluxtable = fluxfile0, 
           listfile = ms+'.fluxscale.txt0',
           append = False)               
