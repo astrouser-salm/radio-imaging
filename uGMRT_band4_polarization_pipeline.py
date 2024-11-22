@@ -1004,7 +1004,7 @@ for j in range(pcycles):
   print ("Began doing self-cal on :"+scmode+str(count-1))
   default(gaincal)
   gaincal(vis=ms,caltable=ms+'.'+scmode+str(count-1),selectdata=False,solint=str(sol_int/2**(count-1))+'min',refant=ref_ant,refantmode="strict",
-        minblperant=6, spw=gainspw2,minsnr=3.0,solnorm=True,gaintype="G",calmode=scmode,append=False, uvrange=uvrascal, parang=False)
+        minblperant=6, spw=gainspw2,minsnr=3.0,solnorm=False,gaintype="G",calmode=scmode,append=False, uvrange=uvrascal, parang=False)
 # 
   print ("Began processing :"+scmode+str(count-1))
   default(applycal)
