@@ -71,6 +71,10 @@ print ("Initializing parameters") #Change these according to your data
 
 
 fluxfield      = '0,3'            # field number of the primary flux calibrator
+#If any of your fluxfield is absent in the catalog, better not to add it as a fluxfield, CASA solves it incorrectly 
+#always check fluxscale results
+#verified by Salmoli
+
 fluxfieldind=fluxfield.split(',') #this is useful if you have more than one flux calibrators                     ------ Salmoli Ghosh
 phasefield = '1'                  # field number of the phase calibrator
 polcalib = '3'                    # field number of the polarized calibratorar 1
@@ -86,7 +90,8 @@ specave = 7                       # number of channels to average; suggested pos
 timeave = '0s'                    # time averaging
 gainspw2 = '0:7~150'              # central good channels after split for self-cal
 
-bpassfield     = '3'              # field number of the bandpass calibrator which has been observed almost throughout the observations, add phasecal if strong enough
+bpassfield     = '3'              # field number of the bandpass calibrator which has been observed atleast twice during the observations, add phasecal only if it is very strong 
+#tested by Salmoli Ghosh
 
 gaincals       ='0,1,3,4'         # flux and phase calibrators
 allcals        ='0,1,3,4'         # all calibrators
@@ -695,7 +700,10 @@ set4=setjy(vis=ms, field = unpolcalib, spw = '', scalebychan=True, standard='man
   
 print('setjy output for polarized calibrator', set3)
 print('setjy output for unpolarized calibrator', set4)
-
+#
+#If you are using some other flux calibrator afterwards, do a setjy for that too
+#verified by Salmoli
+#
 print (" starting cross-hand delay calibration -> %s" % kcross1)
 gaincal(vis=ms, caltable = kcross1, field = polcalib, spw = '', 
         refant = ref_ant, solint = 'inf', gaintype = 'KCROSS', combine = 'scan', calmode='ap',append=False,
