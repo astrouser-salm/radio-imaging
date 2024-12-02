@@ -674,13 +674,7 @@ gaincal(vis=ms, caltable = gainfile, field = gaincals, spw = gainspw,
         gaintable = [kcorrfile,bpassfile], gainfield = [kcorrfield,bpassfield],
         append = False, parang = True)
 
-default(fluxscale)
-print (" starting fluxscale -> %s" % fluxfile)
-fluxsc2=fluxscale(vis=ms, caltable = gainfile, reference = [fluxfield], 
-          transfer = [transferfield], fluxtable = fluxfile, 
-          listfile = ms+'.fluxscale.txt2',
-          append = False) 
-print(fluxsc2) 
+
 ######################################################################################################################################################################################################
 #
 #  Polarization Calibration   
@@ -767,6 +761,15 @@ polcal(vis=ms, caltable = polang1, spw='', field = polcalib, refant = ref_ant, s
 ######################################################################################################################################################################################################
 polang = polang1 #or polang2
 polangcalib = polcalib #or polcalib2
+######################################################################################################################################################################################################
+#doing fluxscaling
+default(fluxscale)
+print (" starting fluxscale -> %s" % fluxfile)
+fluxsc2=fluxscale(vis=ms, caltable = gainfile, reference = [fluxfield], 
+          transfer = [transferfield], fluxtable = fluxfile, 
+          listfile = ms+'.fluxscale.txt2',
+          append = False) 
+print(fluxsc2) 
 ######################################################################################################################################################################################################
 #
 #Applying the final calibration
