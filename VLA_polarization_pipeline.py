@@ -8,19 +8,19 @@ data='19B-198.sb37296228.eb37511549.58797.518064895834'
 ms=data+'.ms'
 
 
-fluxcal='3C138' # calibrator used to determine solutions for stokeI, cross hand delay and RL pol angle
-fluxfield='0'
-polcalib='3C138'
-polfield='0'
-target='XXXX'
-targetfield='2'
-phasecal='XXXX'
-phasefield='3'
-unpolcal='3C84'
-unpolfield='1'
-rfreq='9.75278139576GHz'        #check from casa log
+fluxcal='3C138' # flux calibrator name
+fluxfield='0' # flux calibrator field id
+polcalib='3C138' #polarisation calibrator
+polfield='0' #polarisation calibrator field id
+target='XXXX'  #target name
+targetfield='2' #target field id
+phasecal='XXXX' #phase calibrator name
+phasefield='3' #phase calibrator field id
+unpolcal='3C84' #low polarisation calibrator name
+unpolfield='1' #low polarisation calibrator field id
+rfreq='9.75278139576GHz'        #check from previous casa log (search reffreq)
 reffreq=9.75278139576
-fluxdensity_UNPOL=31.17500435967818  #from the weblog, fluxboot task
+fluxdensity_UNPOL=31.17500435967818  #from the casa log, fluxboot task
 spix_UNPOL=[-0.17523711119766397,-0.88798061264207295] #from the weblog, fluxboot task
 inifreq=8   #initial frequency #check from listobs  (for giving frequency range for interpolation)
 endfreq=12   #final frequency 
@@ -93,7 +93,7 @@ hifv_statwt(datacolumn='corrected')
 
 print("At frequency (in GHz)=",reffreq)
 
-data = np.loadtxt('/data/kharb/salmoli/Calibrator_data/'+fluxcal+'_2019.txt')
+data = np.loadtxt('~/Downloads'+polcalib+'_2019.txt')    #After downloading the polarised calibrator's tables from VLA polarimetry page. 
 data_index_range=np.where((data[:,0]>inifreq-3.0) & (data[:,0]<endfreq+3.0)) 
 data_to_use=data[data_index_range]
 popt, pcov = curve_fit(S, data_to_use[:,0], data_to_use[:,1])
@@ -140,7 +140,7 @@ print (" starting Polarization calibration -> ")
 #
 print (" setting the polarization calibrator models for polarized calibrator-> %s" % polcalib)
  
-setjy(vis=ms,field=fluxfield,spw='',selectdata=False,timerange='',scan='',intent='', 
+setjy(vis=ms,field=polfield,spw='',selectdata=False,timerange='',scan='',intent='', 
 observation='',scalebychan=True,standard='manual',model='',listmodels=False, 
 fluxdensity=[I,0,0,0],spix=alpha,reffreq=rfreq,polindex=polfrac,polangle=polangle,
 rotmeas=0,fluxdict={},useephemdir=False,interpolation='nearest',usescratch=True,ismms=False)
