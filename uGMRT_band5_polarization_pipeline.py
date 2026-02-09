@@ -597,7 +597,7 @@ gaincal(vis=ms, caltable = gainfile, field = gaincals, spw = gainspw,
 print (" Starting Polarization Calibration")
 #Polarization calibration steps are for solving equations in linear basis (X and Y)
 #The following steps have been adapted from ALMA polarization calibration procedure (checked by Salmoli Ghosh, Silpa S.; J. Baghel tested the other method)
-
+#Includes outputs for reference
 ######################################################################################################################################################################################################
 kcross = kcross1
 kcrosscalib = polcalib
