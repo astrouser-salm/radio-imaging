@@ -80,6 +80,7 @@ badchans ='0:1168~2047'           #persistant RFI after 778 MHz, also sensitivit
 splitspw = '0:0~1167'             # split channel range if you want to split out only the good channels          ------ Salmoli Ghosh
 samptime=2.6                      #sampling time in seconds                                                      ------ Salmoli Ghosh
 gainspw = '0:50~1100'             # central ~ 75% good channel range for calibration
+polspw = '0:100~800'              #selecting a narrower band for polarization calibration   
 specave = 10                       # number of channels to average; suggested post-average BW (approx)
                                  
 timeave = '0s'                    # time averaging
@@ -590,159 +591,149 @@ gaincal(vis=ms, caltable = gainfile, field = gaincals, spw = gainspw,
         gaintable = [kcorrfile,bpassfile], gainfield = [kcorrfield,bpassfield],
         append = False, parang = True)
 
+fluxsc=fluxscale(vis=ms, caltable = gainfile, reference = [fluxfield], 
+          transfer = [transferfield], fluxtable = fluxfile, 
+          listfile = ms+'.fluxscale.txt',
+          append = False) 
 
+######################################################################################################################################################################################################
+#
+#  Applying calibration on phase calibrator for checking               
+#
+######################################################################################################################################################################################################
+
+applycal(vis=ms, field = phasefield, spw = '', selectdata = False, calwt = False,
+gaintable = [kcorrfile, bpassfile, fluxfile], interp=['','nearest','nearest'], gainfield = [kcorrfield, bpassfield,phasefield],parang= False)
 
 ######################################################################################################################################################################################################
 #
 print (" Starting Polarization Calibration")
 #Polarization calibration steps are for solving equations in linear basis (X and Y)
-#The following steps have been adapted from ALMA polarization calibration procedure (checked by Salmoli Ghosh, Silpa S.; J. Baghel tested the other method)
-#Includes outputs for reference
+#The following steps have been adapted from ALMA polarization calibration procedure (checked by Salmoli Ghosh, Janhavi Baghel, Silpa S.)
+#The polarization calibration part has been followed from https://casaguides.nrao.edu/index.php/3C286_Band6Pol_Calibration_for_CASA_6.6.6#Polarization_Calibration
 ######################################################################################################################################################################################################
 kcross = kcross1
 kcrosscalib = polcalib
 
 
 from casarecipes.almapolhelpers import *
-'''
-applycal(vis=ms, field = phasefield, spw = '', selectdata = False, calwt = False,
-gaintable = [kcorrfile, bpassfile, fluxfile], interp=['','nearest','nearest'], gainfield = [kcorrfield, bpassfield,phasefield],parang= True)
-'''     
+
+######################################################################################################################################################################################################
+#
+#Solving for gains considering an unpoarized calibrator of model [i,0,0,0]. The determined gains will absorb all the polarization contributions
+#
+######################################################################################################################################################################################################
+
 gcalpol=ms+'.gcalpol'
+default(gaincal)
 gaincal(vis=ms,caltable=gcalpol,field=polcalib,solint='int',smodel=[1,0,0,0], gaintype='G',
-gaintable=[bpassfile], refant=ref_ant, refantmode='strict', interp='nearest',parang=True)
-      
-     
-qu=qufromgain(gcalpol)
-'''
-Latitude =  19.1000701545
-Found as many as 4 fields.
-Can't discern an ALMA bandname from: none
-Found as many as 1 spws.
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-Fld= 3 Spw= 0 Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-(B=none, PA offset=0.0deg) Gx/Gy= 1.31574458345 Q= 0.0735198593522 U= -0.0659361906026 P= 0.0987560172868 X= -20.943650689
-For field id =  3  there are  1 good spws.
-Spw mean: Fld= 3 Q= 0.0735198593522 U= -0.0659361906026 (rms= 0.0 0.0 ) P= 0.0987560172868 X= -20.943650689
-'''
-'''
-Latitude =  19.10007015450946
-Found as many as 4 fields.
-Can't discern an ALMA bandname from: none
-Found as many as 1 spws.
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-/data/salmoli/Downloads/casa-6.5.4-9-pipeline-2023.1.0.125/lib/py/lib/python3.8/site-packages/casarecipes/almapolhelpers.py:168: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
-To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
-  fit=pl.lstsq(A,pl.square(ratio))
-/data/salmoli/Downloads/casa-6.5.4-9-pipeline-2023.1.0.125/lib/py/lib/python3.8/site-packages/casarecipes/almapolhelpers.py:174: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
-To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
-  fit=pl.lstsq(A,pl.square(rsum))
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-Fld= 1 Spw= 0 (B=none, PA offset=0.0deg) Gx/Gy= -2.5360252695541585 Q= 4.361403508875255 U= -2.5388642870464326 P= 5.046550548173394 X= -15.102290381137898
-For field id =  1  there are  1 good spws.
-Spw mean: Fld= 1 Q= 4.361403508875255 U= -2.5388642870464326 (rms= 0.0 0.0 ) P= 5.046550548173394 X= -15.102290381137898
+gaintable=[bpassfile], refant=ref_ant, refantmode='strict', interp='nearest',spw=polspw)
 
-'''
-gaincal(vis=ms, caltable=kcross1, selectdata=True, gaintype='KCROSS', field=kcrosscalib, solint='inf',refant=ref_ant,  refantmode='strict', smodel=[1,0,1,0], gaintable=[bpassfile,gcalpol], interp=['nearest','linear'])
-'''      
+print("Applying gain solutions on polarized calibrator", polcal)
+      
+default(applycal)
+applycal(vis = ms, field =polcalib, calwt = True, gaintable = [bpassfile,gcalpol], interp = ['nearest','linear'],
+         parang=False) 
+
+######################################################################################################################################################################################################
+#
+#to extract the source polarization information hidden in the gains the function Polfromgain 6.6.6 has been used from casarecipes
+#
+######################################################################################################################################################################################################
+
+     
+qu = polfromgain(vis = ms, tablein = gcalpol, caltable = ms+'.gcalpol_a')
+
+print(qu)
+
+######################################################################################################################################################################################################
+#
+#Solving for cross hand delay; using a polarized model (a non-zero value for U is assumed). 
+#This is just to enforce the assumption of non-zero source polarization signature in the cross-hands in the ratio between data and model. It is not important to specify the polarization Stokes 
+#parameters correctly, since here we are only solving for a phase-like quantity.
+#
+######################################################################################################################################################################################################
+
+
+gaincal(vis=ms, caltable=kcross1, selectdata=True, spw=polspw, gaintype='KCROSS', field=kcrosscalib, solint='inf',refant=ref_ant,  refantmode='strict', smodel=[1,0,1,0], gaintable=[bpassfile,gcalpol], interp=['nearest','linear'])
+
+    
 applycal(vis=ms, field=polcalib, calwt=True, gaintable=[bpassfile,gcalpol,kcross1], interp=['nearest','linear', 'nearest'])
-'''      
-gaincal(vis=ms,caltable=ms+'.XY0amb', field=polcalib, gaintype='XYf+QU', solint='inf', combine='scan', preavg=300, refant=ref_ant, refantmode='strict', smodel=[1,0,1,0], gaintable=[bpassfile,gcalpol,kcross1], interp=['nearest','linear','nearest'])
+
+######################################################################################################################################################################################################
+#
+#Estimating both the XY-phase offset and the source polarization from the cross-hands using Xfparang+QU.
+#
+######################################################################################################################################################################################################
+
+
+Xfparang=ms+'.Xfparang'
+S = polcal(vis = ms, caltable = Xfparang, field = polcalib, spw=polspw, poltype = 'Xfparang+QU', solint = 'inf', combine = 'scan', preavg = 300,
+           smodel = qu['3C286']['SpwAve'], gaintable = [bpassfile,gcalpol,kcross1],
+           interp = ['nearest','linear','nearest'])
+
+applycal(vis = ms, field = polcalib, calwt = [True,True,False,False], gaintable = [bpassfile,gcalpol,kcross1,Xfparang],
+         interp = ['nearest','linear','nearest','nearest'])
+ 
      
-'''     
-Spw = 0 (ich=1024/2048): 
- X-Y phase = -54.5277668048 deg.
- Fractional Poln: Q = -0.290090739727, U = 0.0144347893074; P = 0.290449659346, X = 88.5756682681deg.
- Net (over baselines) instrumental polarization: 0.114551083591
-''' 
-xy0amb=ms+'.XY0amb'
-
-S=xyamb(xytab=xy0amb,qu=list(qu.values())[0],xyout=ms+'.XY0')
-'''
-Expected QU =  (4.361403508875255, -2.5388642870464326)
-Spw = 0: Found QU = [-0.29009074  0.01443479]
-   ...CONVERTING X-Y phase from 23.572392498095944 to -156.42760750190408 deg
-Ambiguity resolved (spw mean): Q= 0.29009073972702026 U= -0.014434789307415485 (rms= 0.0 0.0 ) P= 0.2904496521218769 X= -1.424331780744425
-Returning the following Stokes vector: [1.0, 0.29009073972702026, -0.014434789307415485, 0.0]
-'''
-xy0=ms+'.XY0'
-
-'''
-applycal(vis=ms, field=polcalib, calwt=[True,True,False,False], gaintable=[bpassfile,gcalpol,kcross1,xy0], interp=['nearest','linear','nearest','nearest'])
-'''
-
+######################################################################################################################################################################################################
+#
+#Revising gains with good source polarization estimates
+#
+######################################################################################################################################################################################################
 gcalpol2=ms+'.gcalpol2'
+gaincal(vis = ms, caltable = gcalpol2, field = polcalib, spw=polspw, solint = 'int', refant = ref_ant, refantmode = 'strict', smodel = S['3C286']['SpwAve'],
+        gaintable = [bpassfile], interp = ['nearest'], parang = True)
 
-gaincal(vis=ms, caltable=gcalpol2, field=polcalib, solint='int', refant=ref_ant, refantmode='strict', smodel=S, gaintable=[bpassfile],interp=['nearest'], parang=True)
-      
-qu1=qufromgain(gcalpol2)
-'''
-Latitude =  19.1000701545
-Found as many as 4 fields.
-Can't discern an ALMA bandname from: none
-Found as many as 1 spws.
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-Fld= 3 Spw= 0 Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-(B=none, PA offset=0.0deg) Gx/Gy= 1.2736415716 Q= -0.0585953563219 U= -0.0827969321728 P= 0.101433464693 X= -62.643513808
-For field id =  3  there are  1 good spws.
-Spw mean: Fld= 3 Q= -0.0585953563219 U= -0.0827969321728 (rms= 0.0 0.0 ) P= 0.101433464693 X= -62.643513808
-Out[58]: {3: (-0.058595356321934175, -0.082796932172799736)}
 
-Latitude =  19.10007015450946
-Found as many as 4 fields.
-Can't discern an ALMA bandname from: none
-Found as many as 1 spws.
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-/data/salmoli/Downloads/casa-6.5.4-9-pipeline-2023.1.0.125/lib/py/lib/python3.8/site-packages/casarecipes/almapolhelpers.py:168: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
-To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
-  fit=pl.lstsq(A,pl.square(ratio))
-/data/salmoli/Downloads/casa-6.5.4-9-pipeline-2023.1.0.125/lib/py/lib/python3.8/site-packages/casarecipes/almapolhelpers.py:174: FutureWarning: `rcond` parameter will change to the default of machine precision times ``max(M, N)`` where M and N are the input matrix dimensions.
-To use the future default and silence this warning we advise to pass `rcond=None`, to keep using the old, explicitly pass `rcond=-1`.
-  fit=pl.lstsq(A,pl.square(rsum))
-Can't discern an ALMA bandname from: none
-Unresolved bandname: default band position angle set to 0.0
-Fld= 1 Spw= 0 (B=none, PA offset=0.0deg) Gx/Gy= -8.359516454790715 Q= 2.673681871991404 U= -1.4111989618780396 P= 3.0232527619471576 X= -13.912794750857126
-For field id =  1  there are  1 good spws.
-Spw mean: Fld= 1 Q= 2.673681871991404 U= -1.4111989618780396 (rms= 0.0 0.0 ) P= 3.0232527619471576 X= -13.912794750857126
-'''
-polcal(vis=ms, caltable=ms+'.Df0', field=polcalib, solint='inf',combine='scan', preavg=300, poltype='Dflls', refant='', smodel=S, gaintable=[bpassfile,gcalpol2,kcross1,xy0], gainfield=['', '', '', ''], interp=['nearest','linear','nearest','nearest']
-      
-df0=ms+'.Df0'
-      
-Dgen(dtab=df0,dout=ms+'.Df0gen')
+gcalpol2a=ms+'.gcalpol2a'
+qu2 = polfromgain(vis=ms, tablein=gcalpol2, caltable=gcalpol2a)
+print(qu2)
 
-df0gen=ms+'.Df0gen'
+######################################################################################################################################################################################################
+#
+#Solving for leakage terms
+#
+######################################################################################################################################################################################################
+Df0gen=ms+'.Df0gen'
+polcal(vis = ms, caltable = Df0gen, field = polcalib, spw=polspw, solint = 'inf', combine = 'scan', preavg = 300, poltype = 'Dflls', refant = '', smodel = S['3C286']['SpwAve'],
+       gaintable = [bpassfile,gcalpol2,kcross1,Xfparang], gainfield = ['','','',''], interp = ['nearest','linear','nearest','nearest']) 
 
-applycal(vis=ms, field=polcalib, calwt=[False,True,True,False,False,False], gaintable=[kcorrfile,bpassfile,gcalpol2,kcross1,xy0,df0gen], interp=['','nearest','linear','linear','nearest','nearest'], gainfield=[kcorrfield,bpassfield, '', '','', '',], parang=True, applymode='calonly')
-'''
-tclean(vis=ms,
-      ...:       field='3',
-      ...:       imagename='3C286.noDterm.Stokes.clean',
-      ...:       cell=['0.5arcsec'],
-      ...:       imsize=[1000,1000],
-      ...:       stokes='IQUV',
-      ...:       deconvolver='clarkstokes',
-      ...:       interactive=True, 
-      ...:       weighting='briggs',
-      ...:       robust=0.5,
-      ...:       niter=1000)
-      
-df0gen=ms+'.Df0gen'
-      ...: applycal(vis=ms, 
-      ...:          field='3', 
-      ...:          calwt=[True,True,False,False,False],
-      ...:          gaintable=[bpassfile,gcalpol2,kcross1,xy0,df0gen],
-      ...:          interp=['nearest','linear', 'linear','nearest', 'nearest'],  
-      ...:          gainfield=['', '','', '', ''],
-      ...:          parang=True)
-'''     
+######################################################################################################################################################################################################
+#
+#Solving the Global Normalized Gain Amplitudes
+#
+######################################################################################################################################################################################################
+
+Gxyamp=ms+'.Gxyamp'
+gaincal(vis = ms, caltable = Gxyamp, field = polcalib, solint = 'inf', spw=polspw, combine = 'scan', refant = ref_ant, refantmode = 'strict', gaintype = 'G', calmode = 'a',
+        smodel = S['3C286']['SpwAve'], gaintable = [bpassfile,gcalpol2,kcross1,Xfparang,Df0gen], gainfield = ['','','','',''],
+        interp = ['nearest','linear','nearest','nearest','nearest'], solnorm = True, parang = True)
+
+######################################################################################################################################################################################################
+#
+#Applying the calibration solutions to all the sources
+#
+######################################################################################################################################################################################################
+default(applycal)
+
+applycal(vis = ms, field = polcalib, calwt = [True,True,False,False,False], gaintable = [bpassfile,gcalpol2,kcross1,Xfparang,Df0gen],
+         interp = ['nearest','linear','linear','nearest','nearest'], gainfield = ['','','','',''], parang = True)
+
+applycal(vis = ms, field = phasefield, calwt = [True,True,False,False,False,False,False], gaintable = [kcorrfile, bpassfile, fluxfile,kcross1,Xfparang,Df0gen,Gxyamp],
+         interp = ['','nearest','linear','nearest','nearest','nearest','nearest'], gainfield = [kcorrfield,bpassfield,phasefield,'','','',''], parang = True)
+
+applycal(vis = ms, field = target, calwt = [True,True,False,False,False,False,False], gaintable = [kcorrfile, bpassfile, fluxfile,kcross1,Xfparang,Df0gen,Gxyamp],
+         interp = ['','nearest','linear','nearest','nearest','nearest','nearest'], gainfield = [kcorrfield,bpassfield,phasefield,'','','',''], parang = True)
+
+applycal(vis = ms, field = unpolcalib, calwt = [True,True,False,False,False,False,False], gaintable = [kcorrfile, bpassfile, fluxfile,kcross1,Xfparang,Df0gen,Gxyamp],
+         interp = ['','nearest','linear','nearest','nearest','nearest','nearest'], gainfield = [kcorrfield,bpassfield,unpolcalib,'','','',''], parang = True)
+
+tclean(vis = ms, field = polcalib, imagename = 'polcal.StokesIQUV.withDterms', cell = ['0.5arcsec'],imsize = [250,250], stokes = 'IQUV',
+       deconvolver = 'clarkstokes', weighting = 'briggs', robust = 0.5, interactive = True,  niter = 500, cycleniter = 20)
+
+
+
 ######################################################################################################################################################################################################
 #
 #Imaging polarized calibrator after polarization calibration
@@ -761,15 +752,7 @@ tclean(vis=ms,
 	robust=0.5,
 	interactive=True, niter=10000)
 	
-######################################################################################################################################################################################################
-#
-#Applying the final calibration to other sources and target
-#
-######################################################################################################################################################################################################
-      
-applycal(vis=ms, field=unpolcalib, calwt=[False,True,False,False,False,False], gaintable = [kcorrfile,bpassfile,gainfile, kcross1,xy0,df0gen], interp=['','nearest','linear','nearest','nearest','nearest'], gainfield=[kcorrfield,bpassfield,unpolcal,'', '', ''], parang=True,applymode='calonly')
 
-applycal(vis=ms, field=phasefield,target, calwt=[False,True,False,False,False,False], gaintable = [kcorrfile,bpassfile,fluxfile, kcross1,xy0,df0gen], interp=['','nearest','linear','nearest','nearest','nearest'], gainfield=[kcorrfield,bpassfield,phasefield,'', '', ''], parang=True, applymode='calonly')
 
 ######################################################################################################################################################################################################
 #
