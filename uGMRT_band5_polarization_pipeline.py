@@ -36,7 +36,7 @@
 '''
 ####################################################################################################################################
 #listscan filename.lta
-
+print("This is Band-5 (1000-1460 MHz) data analysis which receives linear signals (XX, YY, XY, YX). So, the R an L in the log needs to be renamed as X and Y before running gvfits.")
 #gvfits filename.log
 
 #open casa
